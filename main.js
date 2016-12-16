@@ -150,7 +150,7 @@ function setScore(guesses){
 	score -=  (guesses * 10);
 
 	//set score to decrease the more time has passed
-	score -= (seconds * 10) + tenthSeconds); 
+	score -= ((seconds * 10) + tenthSeconds); 
 
 	yourScoreDisplay.textContent = score; 
 }
