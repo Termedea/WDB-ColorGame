@@ -4,7 +4,13 @@ var backgroundColor = "#232323";
 var headerColor = "steelblue";
 var colorList = [];
 var numSquares;  
-
+var score; 
+var seconds = 0;
+var tenthSeconds = 0
+var guesses = 0;
+var intervalId;
+var highScoreCookie;
+var highScoreCookieName = "highScore";
 //elements to manipulate
 var colorDisplay = document.getElementById("colorDisplay");
 var squares = document.querySelectorAll(".square");
@@ -12,6 +18,11 @@ var messageDisplay = document.getElementById("message");
 var h1 = document.querySelector("h1");
 var resetBtn = document.getElementById("resetBtn");
 var modeBtns = document.querySelectorAll(".mode");
+var timerDisplay = document.getElementById("timerDisplay");
+var yourScoreDisplay = document.getElementById("yourScoreDisplay");
+var highScoreDisplay = document.getElementById("highScoreDisplay");
+
+
 
 
 
@@ -21,12 +32,82 @@ init();
 function init(){
 
 	numSquares = 6; 
-	
+	highScoreCookie = getCookie(highScoreCookieName);
+
+	if(highScoreCookie){
+		highScoreDisplay.textContent = highScoreCookie;
+	}
+
 	setUpButtons();
-	setUpSquares();
-	renderUI();
+	setUpSquares();	
+	startGame();
+	
 }
 
+
+function startGame(){
+
+	score = 1000;	
+	seconds = 0;
+	tenthSeconds = 0; 
+	guesses = 0;
+	renderUI();
+
+	intervalId = setInterval(updateTime, 100);
+	setScore(guesses);
+}
+
+
+
+function updateTime(){
+	if(tenthSeconds < 9){
+			tenthSeconds++;
+		}else {
+			tenthSeconds = 0;
+			seconds++
+		}
+
+		timerDisplay.textContent = seconds +"."+tenthSeconds;
+}
+
+function setScore(guesses){
+
+	//set score to decrease the more squares you have guessed
+	score -=  (guesses * 10);
+
+	//set score to decrease the more time has passed
+	score -= ((seconds * 10) + tenthSeconds); 
+
+	yourScoreDisplay.textContent = score; 
+}
+
+function win (clickedColor) {
+	messageDisplay.textContent = "Correct!";
+	changeToWinningColor(clickedColor);
+	resetBtn.textContent = "Play again?";
+	
+	//if there is a highscore cookie
+	if(highScoreCookie){
+
+		//get it and check if it's lower than score
+		var highScore = Number(highScoreCookie);
+		if(score > highScore){
+			//if it is, set new highscore cookie
+			highScore = score; 
+			setCookie(highScoreCookieName, highScore)		
+		}			
+	//if there is no highscorecookie, also set new highscorecookie
+	}else{
+		highScore = score; 
+		setCookie(highScoreCookieName, highScore)		
+	}
+	//update ui
+	highScoreDisplay.textContent = highScore;
+
+	//stop timer
+	clearInterval(intervalId);
+	
+}
 
 function setUpSquares(){
 	//EventListeners for squares
@@ -35,19 +116,18 @@ function setUpSquares(){
 		
 		//event listeners for squares containing game logic
 		squares[i].addEventListener("click", function () {
-			
+				
 			//grab color of clicked square and compare to correctColor
 			var clickedColor = this.style.background;
-
 			if(clickedColor === correctColor){
 				//win
-				messageDisplay.textContent = "Correct!";
-				changeToWinningColor(clickedColor);
-				resetBtn.textContent = "Play again?";
-			}else{
-				//lose
+				win(clickedColor);
+				
+			}else{			
 				this.style.background =  backgroundColor; 
 				messageDisplay.textContent = "Try again!";
+				setScore(++guesses);
+
 			}
 
 		})
@@ -70,7 +150,7 @@ function setUpButtons(){
 	}
 	//EventListener for resetbutton
 	resetBtn.addEventListener("click", function(){
-		renderUI();
+		startGame();
 	});
 }
 
@@ -136,4 +216,33 @@ function changeToWinningColor (color) {
 		squares[i].style.background = color; 
 	}
 	h1.style.background = color; 
+}
+
+function setCookie (name, value, days) {
+    var expires;
+    if (days) {
+        var date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        expires = "; expires=" + date.toGMTString();
+    }
+    else {
+        expires = "90";
+    }
+   
+    document.cookie = name + "=" + value +";" +expires + "; path=/";
+}
+
+function getCookie(c_name) {
+    if (document.cookie.length > 0) {
+        c_start = document.cookie.indexOf(c_name + "=");
+        if (c_start != -1) {
+            c_start = c_start + c_name.length + 1;
+            c_end = document.cookie.indexOf(";", c_start);
+            if (c_end == -1) {
+                c_end = document.cookie.length;
+            }
+            return unescape(document.cookie.substring(c_start, c_end));
+        }
+    }
+    return "";
 }

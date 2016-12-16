@@ -56,8 +56,9 @@ h1 span#colorDisplay{
 	font-weight: bold;
 	vertical-align: middle;
   	display: table-cell; 
+  	width: 33%;
 }
-span#timeDisplay{
+span#timerDisplay{
 	font-size: 2em;
 }
 button:hover, .selected{
