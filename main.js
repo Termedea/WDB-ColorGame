@@ -24,7 +24,7 @@ var yourScoreDisplay = document.getElementById("yourScoreDisplay");
 var highScoreDisplay = document.getElementById("highScoreDisplay");
 
 
-/** Initialize game **//
+/** Initialize game **/
 init();
 //Set up game parameters
 function init(){
