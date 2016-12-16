@@ -1,5 +1,5 @@
 
-//general variables
+//General variables
 var backgroundColor = "#232323";
 var headerColor = "steelblue";
 var colorList = [];
@@ -11,7 +11,8 @@ var guesses = 0;
 var intervalId;
 var highScoreCookie;
 var highScoreCookieName = "highScore";
-//elements to manipulate
+
+//Elements to manipulate
 var colorDisplay = document.getElementById("colorDisplay");
 var squares = document.querySelectorAll(".square");
 var messageDisplay = document.getElementById("message");
@@ -23,12 +24,9 @@ var yourScoreDisplay = document.getElementById("yourScoreDisplay");
 var highScoreDisplay = document.getElementById("highScoreDisplay");
 
 
-
-
-
-//initialize game
+/** Initialize game **//
 init();
-
+//Set up game parameters
 function init(){
 
 	numSquares = 6; 
@@ -40,11 +38,10 @@ function init(){
 
 	setUpButtons();
 	setUpSquares();	
-	startGame();
-	
+	startGame();	
 }
 
-
+//Start new game
 function startGame(){
 
 	score = 1000;	
@@ -57,57 +54,10 @@ function startGame(){
 	setScore(guesses);
 }
 
+/***************************************************/
 
 
-function updateTime(){
-	if(tenthSeconds < 9){
-			tenthSeconds++;
-		}else {
-			tenthSeconds = 0;
-			seconds++
-		}
-
-		timerDisplay.textContent = seconds +"."+tenthSeconds;
-}
-
-function setScore(guesses){
-
-	//set score to decrease the more squares you have guessed
-	score -=  (guesses * 10);
-
-	//set score to decrease the more time has passed
-	score -= ((seconds * 10) + tenthSeconds); 
-
-	yourScoreDisplay.textContent = score; 
-}
-
-function win (clickedColor) {
-	messageDisplay.textContent = "Correct!";
-	changeToWinningColor(clickedColor);
-	resetBtn.textContent = "Play again?";
-	
-	//if there is a highscore cookie
-	if(highScoreCookie){
-
-		//get it and check if it's lower than score
-		var highScore = Number(highScoreCookie);
-		if(score > highScore){
-			//if it is, set new highscore cookie
-			highScore = score; 
-			setCookie(highScoreCookieName, highScore)		
-		}			
-	//if there is no highscorecookie, also set new highscorecookie
-	}else{
-		highScore = score; 
-		setCookie(highScoreCookieName, highScore)		
-	}
-	//update ui
-	highScoreDisplay.textContent = highScore;
-
-	//stop timer
-	clearInterval(intervalId);
-	
-}
+/** Functions for setting up listeners and gui for game **/
 
 function setUpSquares(){
 	//EventListeners for squares
@@ -156,7 +106,7 @@ function setUpButtons(){
 
 function renderUI () {
 	//generate new colors
-	colorList = generategetRandomColorsArray(numSquares);	
+	colorList = generateRandomColorsArray(numSquares);	
 	//randomize a new correct color
 	correctColor = pickCorrectColor();
 	//present the correct color as rgb text
@@ -178,10 +128,71 @@ function renderUI () {
 	resetBtn.textContent = "New Colors";
 }
 
-//picls the single correct color randomly from colors array
-function pickCorrectColor () {
-	var random = Math.floor(Math.random() * colorList.length);
-	return colorList[random];
+/***************************************************/
+
+
+/** Functions for updating time and score in game **/
+
+function updateTime(){
+	if(tenthSeconds < 9){
+			tenthSeconds++;
+		}else {
+			tenthSeconds = 0;
+			seconds++
+		}
+
+		timerDisplay.textContent = seconds +"."+tenthSeconds;
+}
+
+function setScore(guesses){
+
+	//set score to decrease the more squares you have guessed
+	score -=  (guesses * 10);
+
+	//set score to decrease the more time has passed
+	score -= (seconds * 10) + tenthSeconds); 
+
+	yourScoreDisplay.textContent = score; 
+}
+
+/***************************************************/
+
+
+/** Functions for game logic **/
+
+//Logic for design and scores upon winning
+function win (clickedColor) {	
+	//stop timer
+	clearInterval(intervalId);	
+	
+	//determine highscore
+	checkHighScore();
+	//update ui
+	
+	messageDisplay.textContent = "Correct!";
+	changeToWinningColor(clickedColor);
+	resetBtn.textContent = "Play again?";	
+}
+
+//Check if the winning score is a highscore
+function checkHighScore () {
+	//if there is a highscore cookie
+	if(highScoreCookie){
+
+		//get it and check if it's lower than score
+		var highScore = Number(highScoreCookie);
+		if(score > highScore){
+			//if it is, set new highscore cookie
+			highScore = score; 
+			setCookie(highScoreCookieName, highScore)		
+		}			
+	//if there is no highscorecookie, also set new highscorecookie
+	}else{
+		highScore = score; 
+		setCookie(highScoreCookieName, highScore)		
+	}
+
+	highScoreDisplay.textContent = highScore;
 }
 
 //Generates single random RGB-color
@@ -199,7 +210,8 @@ function getRandomColor(){
 	return "rgb("+red+", "+green+", "+blue+")";
 }
 
-function generategetRandomColorsArray (num) {
+//Generates all random colors for game (for 3 or 6 squares)
+function generateRandomColorsArray (num) {
 
 	var arr = [];
 	//add num random colors to the array
@@ -210,6 +222,13 @@ function generategetRandomColorsArray (num) {
 	return arr; 
 }
 
+//Picks the single correct color randomly from the array of colors
+function pickCorrectColor () {
+	var random = Math.floor(Math.random() * colorList.length);
+	return colorList[random];
+}
+
+//Change ui to show the winning color
 function changeToWinningColor (color) {
 	//loop all squares to change each color
 	for(var i = 0; i<colorList.length; i++){
@@ -217,6 +236,11 @@ function changeToWinningColor (color) {
 	}
 	h1.style.background = color; 
 }
+
+/***************************************************/
+
+
+/** Borrowed functions for cookie handling. **/
 
 function setCookie (name, value, days) {
     var expires;
@@ -246,3 +270,5 @@ function getCookie(c_name) {
     }
     return "";
 }
+
+/***************************************************/
