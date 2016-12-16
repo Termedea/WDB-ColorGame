@@ -68,7 +68,8 @@ function setUpSquares(){
 		squares[i].addEventListener("click", function () {
 				
 			//grab color of clicked square and compare to correctColor
-			var clickedColor = this.style.background;
+			var clickedColor = this.style.backgroundColor;
+			console.log(clickedColor + correctColor);
 			if(clickedColor === correctColor){
 				//win
 				win(clickedColor);
@@ -147,7 +148,7 @@ function updateTime(){
 function setScore(guesses){
 
 	//set score to decrease the more squares you have guessed
-	score -=  (guesses * 10);
+	score -=  (guesses * 15);
 
 	//set score to decrease the more time has passed
 	score -= ((seconds * 10) + tenthSeconds); 
